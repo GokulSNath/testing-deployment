@@ -28,21 +28,21 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-    - name: 'Set releasetype : ${{ inputs.ReleaseType }}'
-       id: releasetype
-       uses: ASzc/change-string-case-action@v5
-       with:
-        string: ${{ inputs.ReleaseType }}
-    
-     - name: 'Get Previous tag'
-       id: previoustag
-       uses: "WyriHaximus/github-action-get-previous-tag@v1"
-       with:
+      - name: 'Set releasetype : ${{ inputs.ReleaseType }}'
+        id: releasetype
+        uses: ASzc/change-string-case-action@v5
+        with:
+          string: ${{ inputs.ReleaseType }}
+      
+      - name: 'Get Previous tag'
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        with:
         fallback: 0.0.1 # Optional fallback tag to use when no tag can be found
-    
-     - name: 'PreValidation'
-       id: PreValidation 
-       run: |
+
+      - name: 'PreValidation'
+        id: PreValidation 
+        run: |
         BRANCH="${GITHUB_REF#refs/heads/}"
         if [ $BRANCH == 'main' ]
         then
@@ -54,7 +54,7 @@ jobs:
 
         tag=${{ steps.previoustag.outputs.tag }}
         read type tag_sha < <(echo $(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/git/ref/tags/$tag" | 
-             jq -r '.object.type,.object.sha'))
+              jq -r '.object.type,.object.sha'))
 
         if [ $type == "commit" ]; then
             echo "commit sha: $tag_sha"
@@ -68,15 +68,15 @@ jobs:
           exit 1
         fi
 
-     - name: Bump release version
-       id: bump_version
-       uses: christian-draeger/increment-semantic-version@1.0.3
-       with:
+      - name: Bump release version
+        id: bump_version
+        uses: christian-draeger/increment-semantic-version@1.0.3
+        with:
         current-version: ${{ steps.previoustag.outputs.tag }}
         version-fragment: ${{ steps.releasetype.outputs.lowercase }}
 
-     - name: Push latest release tag [v.${{ steps.bump_version.outputs.next-version }}]
-       run: |
+      - name: Push latest release tag [v.${{ steps.bump_version.outputs.next-version }}]
+        run: |
           echo "Release type ${{ inputs.ReleaseType }}" >> $GITHUB_STEP_SUMMARY
           echo :rocket: v.${{ steps.bump_version.outputs.next-version }} >> $GITHUB_STEP_SUMMARY
           git config user.name github-actions
