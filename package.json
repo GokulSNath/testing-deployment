@@ -1,0 +1,23 @@
+{
+  "name": "testing-deployment",
+  "version": "1.0.0",
+  "description": "just testing deployment",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "build": "true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GokulSNath/testing-deployment.git"
+  },
+  "keywords": [
+    "deployement"
+  ],
+  "author": "gokulKeyvalue",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GokulSNath/testing-deployment/issues"
+  },
+  "homepage": "https://github.com/GokulSNath/testing-deployment#readme"
+}
