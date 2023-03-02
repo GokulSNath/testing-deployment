@@ -48,7 +48,30 @@ jobs:
       - name: 'PreValidation'
         id: PreValidation
         run: |
-        BRANCH="${steps.current_branch.outputs.branch}"
+BRANCH="${steps.current_branch.outputs.branch}"
+if [ $BRANCH == 'main' ]
+then
+  echo "Branch validation Successful "      
+else
+  echo "Releases only taken from main branch :gun: " >> $GITHUB_STEP_SUMMARY
+  exit 1
+fi
+
+tag=${{ steps.previoustag.outputs.tag }}
+read type tag_sha < <(echo $(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/git/ref/tags/$tag" | 
+      jq -r '.object.type,.object.sha'))
+
+if [ $type == "commit" ]; then
+    echo "commit sha: $tag_sha"
+else
+    sha=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/git/tags/$tag_sha" | jq '.object.sha')
+fi
+PreviousSha=${{ github.sha }}
+if [[ $tag_sha == $PreviousSha ]]
+then
+  echo "Nothing changed from last release :banana:" >> $GITHUB_STEP_SUMMARY
+  exit 1
+fi
         if [ $BRANCH == 'main' ]
         then
           echo "Branch validation Successful "      
