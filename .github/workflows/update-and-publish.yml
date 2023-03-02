@@ -48,7 +48,7 @@ jobs:
       - name: 'PreValidation'
         id: PreValidation
         run: |
-          BRANCH="${steps.current_branch.outputs.branch}"
+          BRANCH="${{ steps.current_branch.outputs.branch }}"
           if [ $BRANCH == 'main' ]
           then
             echo "Branch validation Successful "      
