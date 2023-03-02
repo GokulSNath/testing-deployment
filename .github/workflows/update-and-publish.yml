@@ -53,7 +53,7 @@ jobs:
           then
             echo "Branch validation Successful"
           else
-            echo "Releases only taken from main branch :gun: "
+            echo "Releases only taken from main branch: "
             exit 1
           fi
 
@@ -69,7 +69,7 @@ jobs:
           PreviousSha=${{ github.sha }}
           if [[ $tag_sha == $PreviousSha ]]
           then
-            echo "Nothing changed from last release :banana:" >> $GITHUB_STEP_SUMMARY
+            echo "Nothing changed from last release"
             exit 1
           fi
 
