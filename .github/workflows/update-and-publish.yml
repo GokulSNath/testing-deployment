@@ -28,16 +28,72 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Bump package version and publish package
-        uses: anothrNick/github-tag-action@v1.55.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: true
-          push_tag: true
-          tag_prefix: "v"
-          bump: "minor"
-          path: "package.json"
-          commit: true
-          push: true
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+    - name: 'Set releasetype : ${{ inputs.ReleaseType }}'
+       id: releasetype
+       uses: ASzc/change-string-case-action@v5
+       with:
+        string: ${{ inputs.ReleaseType }}
+    
+     - name: 'Get Previous tag'
+       id: previoustag
+       uses: "WyriHaximus/github-action-get-previous-tag@v1"
+       with:
+        fallback: 0.0.1 # Optional fallback tag to use when no tag can be found
+    
+     - name: 'PreValidation'
+       id: PreValidation 
+       run: |
+        BRANCH="${GITHUB_REF#refs/heads/}"
+        if [ $BRANCH == 'main' ]
+        then
+          echo "Branch validation Successful "      
+        else
+          echo "Releases only taken from main branch :gun: " >> $GITHUB_STEP_SUMMARY
+          exit 1
+        fi
+
+        tag=${{ steps.previoustag.outputs.tag }}
+        read type tag_sha < <(echo $(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/git/ref/tags/$tag" | 
+             jq -r '.object.type,.object.sha'))
+
+        if [ $type == "commit" ]; then
+            echo "commit sha: $tag_sha"
+        else
+            sha=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/git/tags/$tag_sha" | jq '.object.sha')
+        fi
+        PreviousSha=${{ github.sha }}
+        if [[ $tag_sha == $PreviousSha ]]
+        then
+          echo "Nothing changed from last release :banana:" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        fi
+
+     - name: Bump release version
+       id: bump_version
+       uses: christian-draeger/increment-semantic-version@1.0.3
+       with:
+        current-version: ${{ steps.previoustag.outputs.tag }}
+        version-fragment: ${{ steps.releasetype.outputs.lowercase }}
+
+     - name: Push latest release tag [v.${{ steps.bump_version.outputs.next-version }}]
+       run: |
+          echo "Release type ${{ inputs.ReleaseType }}" >> $GITHUB_STEP_SUMMARY
+          echo :rocket: v.${{ steps.bump_version.outputs.next-version }} >> $GITHUB_STEP_SUMMARY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag ${{ steps.bump_version.outputs.next-version }}
+          git push origin ${{ steps.bump_version.outputs.next-version }}
+
+      # - name: Bump package version and publish package
+      #   uses: anothrNick/github-tag-action@v1.55.0
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     tag: true
+      #     push_tag: true
+      #     tag_prefix: "v"
+      #     bump: "minor"
+      #     path: "package.json"
+      #     commit: true
+      #     push: true
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
