@@ -40,10 +40,15 @@ jobs:
         with:
         fallback: 0.0.1 # Optional fallback tag to use when no tag can be found
 
+      - name: 'Extract Current Branch'
+        id: current_branch
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+
       - name: 'PreValidation'
-        id: PreValidation 
+        id: PreValidation
         run: |
-        BRANCH="${GITHUB_REF#refs/heads/}"
+        BRANCH="${steps.current_branch.outputs.branch}"
         if [ $BRANCH == 'main' ]
         then
           echo "Branch validation Successful "      
