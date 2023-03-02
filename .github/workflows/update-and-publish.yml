@@ -1,0 +1,43 @@
+name: Update version and Publish Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      ReleaseType:
+        description: 'Release Type'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - Major
+        - Minor
+        - Bug
+
+jobs:
+  update-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Bump package version and publish package
+        uses: anothrNick/github-tag-action@v1.25.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: true
+          push_tag: true
+          tag_prefix: "v"
+          bump: "minor"
+          path: "package.json"
+          commit: true
+          push: true
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

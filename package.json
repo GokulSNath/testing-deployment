@@ -4,7 +4,7 @@
   "description": "just testing deployment",
   "main": "index.js",
   "scripts": {
-    "test": "test",
+    "test": "true",
     "build": "true"
   },
   "repository": {
