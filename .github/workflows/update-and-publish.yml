@@ -74,6 +74,11 @@ jobs:
           npm version ${{ steps.bump_version.outputs.next-version }} --no-git-tag-version
           git config user.name github-actions
           git config user.email github-actions@github.com
+          git add package.json
+
+          git commit -m "Bump version to $NEW_VERSION"
+          git push origin HEAD:main
+
           git tag v${{ steps.bump_version.outputs.next-version }}
           git push origin v${{ steps.bump_version.outputs.next-version }}
 
