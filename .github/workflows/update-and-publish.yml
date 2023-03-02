@@ -77,8 +77,8 @@ jobs:
         id: bump_version
         uses: christian-draeger/increment-semantic-version@1.0.3
         with:
-        current-version: ${{ steps.previoustag.outputs.tag }}
-        version-fragment: ${{ steps.releasetype.outputs.lowercase }}
+          current-version: ${{ steps.previoustag.outputs.tag }}
+          version-fragment: ${{ steps.releasetype.outputs.lowercase }}
 
       - name: Push latest release tag [v.${{ steps.bump_version.outputs.next-version }}]
         run: |
