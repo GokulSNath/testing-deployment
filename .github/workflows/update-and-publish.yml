@@ -53,24 +53,23 @@ jobs:
             then
               echo "Branch validation Successful"
             else
-              echo "Releases only taken from main branch:"
+              echo "Releases only taken from main branch"
               exit 1
           fi
 
           tag="${{ steps.previous_tag.outputs.tag }}"
-          read type tag_sha < <(
-            echo $(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/git/ref/tags/$tag" | jq -r '.object.type,.object.sha')
-          )
+          read type tag_sha < <(echo $(curl -s -H "Authorization: Bearer ${{ secrets.PAT_FOR_TESTING_DEPLOYMENT_REPO }}" "https://api.github.com/repos/${{ github.repository }}/git/ref/tags/$tag" | jq -r '.object.type,.object.sha'))
 
           if [ "$type" == "commit" ]
             then
               echo "commit sha: $tag_sha"
             else
               echo "Not a commit"
-              sha=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/git/tags/$tag_sha" | jq '.object.sha')
+              sha=$(curl -s -H "Authorization: Bearer ${{ secrets.PAT_FOR_TESTING_DEPLOYMENT_REPO }}" "https://api.github.com/repos/${{ github.repository }}/git/tags/$tag_sha" | jq '.object.sha')
           fi
 
           PreviousSha="${{ github.sha }}"
+          echo "tag-sha $tag_sha"
           if [ "$tag_sha" == "$PreviousSha" ]
             then
               echo "Nothing changed from last release"
@@ -96,7 +95,7 @@ jobs:
       # - name: Bump package version and publish package
       #   uses: anothrNick/github-tag-action@v1.55.0
       #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     github_token: ${{ secrets.PAT_FOR_TESTING_DEPLOYMENT_REPO }}
       #     tag: true
       #     push_tag: true
       #     tag_prefix: "v"
