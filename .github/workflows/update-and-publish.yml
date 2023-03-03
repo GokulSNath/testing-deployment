@@ -76,11 +76,22 @@ jobs:
           git config user.email github-actions@github.com
           git add package.json
 
-          git commit -m "Bump version to $NEW_VERSION"
+          git commit -m "Bump version to ${{ steps.bump_version.outputs.next-version }}"
           git push origin HEAD:main
 
           git tag v${{ steps.bump_version.outputs.next-version }}
           git push origin v${{ steps.bump_version.outputs.next-version }}
+
+      - name: Create GitHub release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_FOR_TESTING_DEPLOYMENT_REPO }}
+        with:
+          tag_name: v${{ steps.bump_version.outputs.next-version }}
+          release_name: Release v${{ steps.bump_version.outputs.next-version }}
+          # body: Release ${{ env.NEW_VERSION }}
+          draft: false
+          prerelease: false
 
       # - name: Bump package version and publish package
       #   uses: anothrNick/github-tag-action@v1.55.0
