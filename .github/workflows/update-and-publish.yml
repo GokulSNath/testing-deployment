@@ -71,8 +71,8 @@ jobs:
   # echo "Release type ${{ inputs.ReleaseType }}" >> $GITHUB_STEP_SUMMARY
   # echo :rocket: v.${{ steps.bump_version.outputs.next-version }} >> $GITHUB_STEP_SUMMARY
         run: |
-          OLD_VERSION = ${{ steps.get_latest_version.outputs.latest_version }}
-          NEW_VERSION = ${{ steps.bump_version.outputs.next-version }}
+          OLD_VERSION=${{ steps.get_latest_version.outputs.latest_version }}
+          NEW_VERSION=${{ steps.bump_version.outputs.next-version }}
 
           npm version $NEW_VERSION --no-git-tag-version
           git config user.name github-actions
