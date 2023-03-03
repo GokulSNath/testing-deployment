@@ -79,7 +79,7 @@ jobs:
           npm publish
         if: success()
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKENN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
       - name: Revert package.json and package-lock.json
         run: |
