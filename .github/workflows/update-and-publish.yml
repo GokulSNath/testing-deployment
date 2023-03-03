@@ -34,6 +34,20 @@ jobs:
         with:
           string: ${{ inputs.ReleaseType }}
 
+      - name: Extract Current Branch and Validate
+        id: get_current_branch
+        shell: bash
+        # run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        run: |
+         BRANCH="${GITHUB_REF#refs/heads/}"
+          if [ "$BRANCH" == 'main' ]
+            then
+              echo "Branch validation Successful"
+            else
+              echo "Releases only taken from main branch"
+              exit 1
+          fi
+
       - name: Get Latest version from package.json
         id: get_latest_version
         run: |
@@ -43,33 +57,14 @@ jobs:
           # Output the latest version as a workflow variable
           echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Extract Current Branch
-        id: get_current_branch
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-
-      - name: PreValidation
-        id: PreValidation
-        run: |
-         BRANCH="${{ steps.get_current_branch.outputs.branch }}"
-          if [ "$BRANCH" == 'main' ]
-            then
-              echo "Branch validation Successful"
-            else
-              echo "Releases only taken from main branch"
-              exit 1
-          fi
-
-      - name: Bump release version
+      - name: Bump version
         id: bump_version
         uses: christian-draeger/increment-semantic-version@1.0.3
         with:
           current-version: ${{ steps.get_latest_version.outputs.latest_version }}
           version-fragment: ${{ steps.release_type.outputs.lowercase }}
 
-      - name: Push latest release tag [v.${{ steps.bump_version.outputs.next-version }}]
-  # echo "Release type ${{ inputs.ReleaseType }}" >> $GITHUB_STEP_SUMMARY
-  # echo :rocket: v.${{ steps.bump_version.outputs.next-version }} >> $GITHUB_STEP_SUMMARY
+      - name: Update version in package.json and Push latest release tag [v.${{ steps.bump_version.outputs.next-version }}]
         run: |
           OLD_VERSION=${{ steps.get_latest_version.outputs.latest_version }}
           NEW_VERSION=${{ steps.bump_version.outputs.next-version }}
