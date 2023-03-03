@@ -41,7 +41,7 @@ jobs:
           LATEST_VERSION=$(node -p "require('./package.json').version")
 
           # Output the latest version as a workflow variable
-          echo "::set-output name=latest_version::$LATEST_VERSION"
+          echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
 
       - name: Extract Current Branch
         id: get_current_branch
