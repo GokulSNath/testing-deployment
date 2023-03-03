@@ -86,6 +86,7 @@ jobs:
           # Revert package.json and package-lock.json to the previous version
           npm version ${{ env.latest_version }} --no-git-tag-version
           git commit -am "Revert to version ${{ env.latest_version }}"
+          git push origin HEAD:main
         if: failure()
 
       - name: Create GitHub release
