@@ -72,7 +72,7 @@ jobs:
           npm version $NEW_VERSION --no-git-tag-version
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add package.json
+          git add package.json package-lock.json
 
           git commit -m "Bump version from $OLD_VERSION to $NEW_VERSION"
           git push origin HEAD:main
