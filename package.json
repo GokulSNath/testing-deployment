@@ -1,6 +1,6 @@
 {
   "name": "testing-deployment",
-  "version": "9.0.1",
+  "version": "9.0.2",
   "description": "just testing deployment",
   "main": "index.js",
   "scripts": {
